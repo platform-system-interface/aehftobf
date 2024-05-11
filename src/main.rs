@@ -13,9 +13,18 @@ pub fn decode_hex(s: &str) -> Result<Vec<u8>, ParseIntError> {
 fn hex_file_to_bin(filename: &str) -> Vec<u8> {
     let mut result = Vec::new();
 
-    for line in read_to_string(filename).unwrap().lines() {
-        for b in decode_hex(line).unwrap() {
-            result.push(b);
+    for (i, line) in read_to_string(filename).unwrap().lines().enumerate() {
+        let len = line.len();
+        if len % 2 != 0 {
+            panic!("Line {i}: uneven number of characters ({len})")
+        }
+        match decode_hex(line) {
+            Ok(l) => {
+                for b in l {
+                    result.push(b)
+                }
+            }
+            Err(e) => panic!("Line {i}: {e}"),
         }
     }
     result
